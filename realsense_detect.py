@@ -13,10 +13,13 @@ class RealsenseDetect:
     def __init__(self, is_cuda):
 
         self.fps = 0.0
+        # TODO: coordinate_dobot_list:Type->list[dict]
+        # coordinate_dobot:Type->dict
         self.coordinate_dobot_list = []
         self.coordinate_dobot = [0, 0, 0]           # 目标相对于机械臂的坐标
         print("load yolo model, waiting...")
         self.model = self.build_model(is_cuda)      # 模型载入
+        # self.thread_realsense_detecting()
         self.thread_realsense_detecting()
 
     def build_model(self, is_cuda):
@@ -148,7 +151,7 @@ class RealsenseDetect:
                 box[3] *= 0.75
 
                 # TODO:修改识别逻辑，避免识别多个结果或检测结果与识别结果不匹配
-                # 使用box限制decode识别区域,另外将box于识别结果通过字典存储
+                # 使用box限制decode识别区域,另外将box于识别结果通过字典存储, 字典格式{"label":box}
                 decoded_objects = decode(gray_image)
 
                 if len(decoded_objects) != 0:

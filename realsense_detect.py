@@ -32,11 +32,7 @@ class RealsenseDetect:
         return net
 
     def detect(self, image, net):
-
-        # pil_image = Image.fromarray(image)
-        # resized_image = cv2.resize(image, (640, 640))
         blob = cv2.dnn.blobFromImage(image, 1 / 255.0, (640, 640), swapRB=True, crop=False)
-
         net.setInput(blob)
         preds = net.forward()
         return preds
@@ -87,6 +83,9 @@ class RealsenseDetect:
 
         return result_class_ids, result_confidences, result_boxes
 
+    def reset_(self):
+        self.coordinate_dobot = []
+
     def thread_realsense_detecting(self):
 
         context = rs.context()
@@ -124,6 +123,8 @@ class RealsenseDetect:
         while True:
             start_t = time.time()
 
+            self.reset_()
+
             frames = pipeline.wait_for_frames()
             frames = align.process(frames)
 
@@ -145,6 +146,9 @@ class RealsenseDetect:
             for box, class_id in zip(boxs, class_ids):
                 box[1] *= 0.75
                 box[3] *= 0.75
+
+                # TODO:修改识别逻辑，避免识别多个结果或检测结果与识别结果不匹配
+                # 使用box限制decode识别区域,另外将box于识别结果通过字典存储
                 decoded_objects = decode(gray_image)
 
                 if len(decoded_objects) != 0:

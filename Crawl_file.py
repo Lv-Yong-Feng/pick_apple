@@ -18,6 +18,7 @@ class Crawl:  # 抓取函数
         time.sleep(0.05)  # 50ms
 
     def threading_crawl(self):
+        # TODO: 修改抓取逻辑
         while True:
             if self.Judge == 1:
                 print("开始抓取...")

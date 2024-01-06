@@ -3,7 +3,7 @@ import chassis_control
 import dobot_control
 import realsense_detect
 import time
-import Crawl_file
+from test import Crawl_file
 
 cc = chassis_control.ChassisControl(port="COM20")  # 机器人地盘
 dc = dobot_control.DobotControl(port='COM22')  # 机器人机械臂

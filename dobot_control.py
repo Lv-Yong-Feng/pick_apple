@@ -1,4 +1,4 @@
-import DobotDllType as dType
+import drivers.DobotDllType as dType
 import threading
 import math
 

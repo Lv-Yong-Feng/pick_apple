@@ -1,7 +1,6 @@
 import threading
 import time
 import dobot_control
-import realsense_detect
 
 dc = dobot_control.DobotControl(port='COM14')  # 机器人机械臂
 

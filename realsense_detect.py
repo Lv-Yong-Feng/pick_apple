@@ -1,11 +1,8 @@
 import dobot_control
 import pyrealsense2 as rs
 import numpy as np
-import threading
-from PIL import Image
 from pyzbar.pyzbar import decode
 import cv2
-import torch
 import time
 
 colors = [(255, 255, 0), (0, 255, 0), (0, 255, 255), (255, 0, 0)]
@@ -17,17 +14,9 @@ class RealsenseDetect:
 
         self.fps = 0.0
         self.coordinate_dobot_list = []
-        # self.coordinate_dobot_list_green = []
-        self.coordinate_dobot = [0, 0, 0]
-        # self.coordinate_dobot_green = [0, 0, 0]
-        # self.coordinate_car = []
+        self.coordinate_dobot = [0, 0, 0]           # 目标相对于机械臂的坐标
         print("load yolo model, waiting...")
-        # self.model = torch.hub.load('./yolov5-master', 'custom', path='./best.pt', source='local')
-        # self.model.conf = 0.5
-        # self.model.classes = [0, 1, 2]  # apple 0   block 1
-        self.model = self.build_model(is_cuda)
-        # thread = threading.Thread(target=self.thread_realsense_detecting, daemon=True)
-        # thread.start()
+        self.model = self.build_model(is_cuda)      # 模型载入
         self.thread_realsense_detecting()
 
     def build_model(self, is_cuda):
@@ -148,10 +137,6 @@ class RealsenseDetect:
 
             gray_image = cv2.cvtColor(color_image, cv2.COLOR_BGR2GRAY)
 
-            self.coordinate_dobot_list = []
-            # self.coordinate_car = []
-            # self.coordinate_dobot_list_green = []
-
             resized_image = cv2.resize(color_image, (640, 640))
             results = self.detect(resized_image, self.model)
             class_ids, confidences, boxs = self.wrap_detection(resized_image, results[0])
@@ -193,15 +178,9 @@ class RealsenseDetect:
                     if item[0] ** 2 + item[1] ** 2 + item[2] ** 2 < item_min:
                         item_min = item[0] ** 2 + item[1] ** 2 + item[2] ** 2
                         tag = i
-                self.coordinate_dobot = self.coordinate_dobot_list[tag]  # 选择最近距离苹果
+                self.coordinate_dobot = self.coordinate_dobot_list[tag]         # 选择最近距离目标
             else:
                 self.coordinate_dobot = [0, 0, 0]
-
-            # if len(self.coordinate_dobot_list_green) != 0:
-            #     self.coordinate_dobot_green = self.coordinate_dobot_list_green[0]
-            # else:
-            #     self.coordinate_dobot_green = [0, 0, 0]
-            # print(self.coordinate_dobot)
             images = np.hstack((color_image, depth_image))
             cv2.putText(images, "fps: {:.2f}".format(self.fps), (5, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.75,
                         (255, 255, 255), 2)
